@@ -2,6 +2,8 @@
 
 import nltk, re
 from nltk.corpus import stopwords
+
+# CHANGE STOPWORDS
 stop = set(stopwords.words('french'))
 import string
 punct = list(string.punctuation)
@@ -10,7 +12,13 @@ punct.remove('-')
 punct.append('«')
 punct.append('»')
 import treetaggerwrapper
-tagger = treetaggerwrapper.TreeTagger(TAGLANG='fr')
+
+# CHANGE LANGUAGE
+tagger = treetaggerwrapper.TreeTagger(TAGLANG='it')
+
+# OPEN CORRECT FILE FOR WRITING
+#fr = open('french_gut3.txt', 'w', encoding='utf-8')
+it = open('italian_gut.txt', 'w', encoding='utf-8')
 
 
 def clean(text):
@@ -26,7 +34,7 @@ def clean(text):
     return book
 
 
-def split_sent(text):
+def split_sent_fr(text):
     # chargement du tokenizer
     tokenizer = nltk.data.load('tokenizers/punkt/PY3/french.pickle')
     sentences = tokenizer.tokenize(text.replace('\n', ' ').replace('&mdash;', ''))
@@ -45,24 +53,70 @@ def split_sent(text):
             # do something now!
             fr.write(sent + '\n')
 
-fr = open('french_gut3.txt', 'w', encoding='utf-8')
-fr_files = set()
-with open('french.txt') as f:
-    for line in f:
-        line = line.strip()
-        fr_files.add(line)
 
-for f in list(fr_files)[:5]:
-    print(f)
-    if len(f) < 10:
-        continue
-    try:
-        with open('./gut/' + f) as fr_text:
-            text = fr_text.read()
-    except UnicodeDecodeError:
-        with open('./gut/' + f, encoding='iso-8859-1') as fr_text:
-            text = fr_text.read()
-    clean_t = clean(text)
-    #print(clean_t)
-    split_sent(clean_t)
-fr.close()
+def split_sent_it(text):
+    tokenizer = nltk.data.load('tokenizers/punkt/PY3/italian.pickle')
+    sentences = tokenizer.tokenize(text.replace('\n', ' ').replace('&mdash;', ''))
+
+    for sent in sentences:
+        if len(sent) > 10:
+            sent = sent.strip(' ').lower()
+            for p in punct:
+                sent = sent.replace(p, '')
+            # for s in stop:
+            #    sent = re.sub('\b{}\b'.format(s), '', sent)
+            sent = re.sub('\s+', ' ', sent)
+            tags = tagger.tag_text(sent)
+            sent = ' '.join([tag.split('\t')[-1] + '_' + tag.split('\t')[1].split(':')[0] for tag in tags])
+            # do something now!
+            fr.write(sent + '\n')
+
+def load_fr():
+    fr_files = set()
+    with open('french.txt') as f:
+        for line in f:
+            line = line.strip()
+            fr_files.add(line)
+
+    for f in fr_files:
+        print(f)
+        if len(f) < 10:
+            continue
+        try:
+            with open('./gut/' + f) as fr_text:
+                text = fr_text.read()
+        except UnicodeDecodeError:
+            with open('./gut/' + f, encoding='iso-8859-1') as fr_text:
+                text = fr_text.read()
+        clean_t = clean(text)
+        #print(clean_t)
+        split_sent_fr(clean_t)
+    fr.close()
+
+
+def load_it():
+    it_files = set()
+    with open('italian.txt') as f:
+        for line in f:
+            line = line.strip()
+            it_files.add(line)
+
+    for f in list(it_files)[:5]:
+        print(f)
+        if len(f) < 10:
+            continue
+        try:
+            with open('./gut/' + f) as it_text:
+                text = it_text.read()
+        except UnicodeDecodeError:
+            with open('./gut/' + f, encoding='iso-8859-1') as it_text:
+                text = it_text.read()
+        clean_t = clean(text)
+        # print(clean_t)
+        split_sent_it(clean_t)
+    it.close()
+
+
+if __name__ == '__main__':
+    # CHANGE INTO CORRECT FUNCTION
+    load_it()
