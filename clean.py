@@ -9,6 +9,8 @@ punct.remove("'")
 punct.remove('-')
 punct.append('«')
 punct.append('»')
+import treetaggerwrapper
+tagger = treetaggerwrapper.TreeTagger(TAGLANG='fr')
 
 
 def clean(text):
@@ -38,9 +40,11 @@ def split_sent(text):
             #for s in stop:
             #    sent = re.sub('\b{}\b'.format(s), '', sent)
             sent = re.sub('\s+', ' ', sent)
+            tags = tagger.tag_text(sent)
+            # do something now!
             fr.write(sent + '\n')
 
-fr = open('french_gut2.txt', 'w', encoding='utf-8')
+fr = open('french_gut3.txt', 'w', encoding='utf-8')
 fr_files = set()
 with open('french.txt') as f:
     for line in f:
