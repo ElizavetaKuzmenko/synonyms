@@ -69,7 +69,7 @@ def split_sent_it(text):
             tags = tagger.tag_text(sent)
             sent = ' '.join([tag.split('\t')[-1] + '_' + tag.split('\t')[1].split(':')[0] for tag in tags])
             # do something now!
-            fr.write(sent + '\n')
+            it.write(sent + '\n')
 
 def load_fr():
     fr_files = set()
