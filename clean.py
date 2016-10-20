@@ -1,24 +1,26 @@
 # coding: utf-8
 
 import nltk, re
-from nltk.corpus import stopwords
+#from nltk.corpus import stopwords
 
 # CHANGE STOPWORDS
-stop = set(stopwords.words('french'))
+#stop = set(stopwords.words('french'))
 import string
 punct = list(string.punctuation)
 punct.remove("'")
 punct.remove('-')
 punct.append('«')
 punct.append('»')
+punct.append('…')
 import treetaggerwrapper
 
 # CHANGE LANGUAGE
-tagger = treetaggerwrapper.TreeTagger(TAGLANG='it')
+tagger = treetaggerwrapper.TreeTagger(TAGLANG='de')
 
 # OPEN CORRECT FILE FOR WRITING
 #fr = open('french_gut3.txt', 'w', encoding='utf-8')
-it = open('italian_gut.txt', 'w', encoding='utf-8')
+#it = open('italian_gut.txt', 'w', encoding='utf-8')
+de = open('german_gut.txt', 'w', encoding='utf-8')
 
 
 def clean(text):
@@ -67,9 +69,28 @@ def split_sent_it(text):
             #    sent = re.sub('\b{}\b'.format(s), '', sent)
             sent = re.sub('\s+', ' ', sent)
             tags = tagger.tag_text(sent)
-            sent = ' '.join([tag.split('\t')[-1] + '_' + tag.split('\t')[1].split(':')[0] for tag in tags])
+            sent = ' '.join([tag.split('\t')[-1].split('|')[0] + '_' + tag.split('\t')[1].split(':')[0] for tag in tags]).replace('@card@_NUM', '').replace('—_NOM', '')
             # do something now!
             it.write(sent + '\n')
+
+
+def split_sent_de(text):
+    tokenizer = nltk.data.load('tokenizers/punkt/PY3/german.pickle')
+    sentences = tokenizer.tokenize(text.replace('\n', ' ').replace('&mdash;', ''))
+
+    for sent in sentences:
+        if len(sent) > 10:
+            sent = sent.strip(' ').lower()
+            for p in punct:
+                sent = sent.replace(p, '')
+            # for s in stop:
+            #    sent = re.sub('\b{}\b'.format(s), '', sent)
+            sent = re.sub('\s+', ' ', sent)
+            tags = tagger.tag_text(sent)
+            sent = ' '.join([tag.split('\t')[-1] + '_' + tag.split('\t')[1].split(':')[0] for tag in tags]).replace('_$', '').replace('@card@_CARD', '')
+            # do something now!
+            de.write(sent + '\n')
+
 
 def load_fr():
     fr_files = set()
@@ -106,10 +127,10 @@ def load_it():
         if len(f) < 10:
             continue
         try:
-            with open('./gut/' + f) as it_text:
+            with open('./gutenberg/' + f) as it_text:
                 text = it_text.read()
         except UnicodeDecodeError:
-            with open('./gut/' + f, encoding='iso-8859-1') as it_text:
+            with open('./gutenberg/' + f, encoding='iso-8859-1') as it_text:
                 text = it_text.read()
         clean_t = clean(text)
         # print(clean_t)
@@ -117,6 +138,30 @@ def load_it():
     it.close()
 
 
+def load_de():
+    de_files = set()
+    with open('german.txt') as f:
+        for line in f:
+            line = line.strip()
+            de_files.add(line)
+
+    for f in list(de_files)[:5]:
+        print(f)
+        if len(f) < 10:
+            continue
+        try:
+            with open('./gutenberg/' + f) as de_text:
+                text = de_text.read()
+        except UnicodeDecodeError:
+            with open('./gutenberg/' + f, encoding='iso-8859-1') as de_text:
+                text = de_text.read()
+        clean_t = clean(text)
+        # print(clean_t)
+        split_sent_de(clean_t)
+    de.close()
+
+
+
 if __name__ == '__main__':
     # CHANGE INTO CORRECT FUNCTION
-    load_it()
+    load_de()
