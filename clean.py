@@ -41,6 +41,7 @@ def split_sent(text):
             #    sent = re.sub('\b{}\b'.format(s), '', sent)
             sent = re.sub('\s+', ' ', sent)
             tags = tagger.tag_text(sent)
+            sent = ' '.join([tag.split('\t')[-1] + '_' + tag.split('\t')[1].split(':')[0] for tag in tags])
             # do something now!
             fr.write(sent + '\n')
 
@@ -51,15 +52,15 @@ with open('french.txt') as f:
         line = line.strip()
         fr_files.add(line)
 
-for f in fr_files:
+for f in list(fr_files)[:5]:
     print(f)
     if len(f) < 10:
         continue
     try:
-        with open('./gutenberg/' + f) as fr_text:
+        with open('./gut/' + f) as fr_text:
             text = fr_text.read()
     except UnicodeDecodeError:
-        with open('./gutenberg/' + f, encoding='iso-8859-1') as fr_text:
+        with open('./gut/' + f, encoding='iso-8859-1') as fr_text:
             text = fr_text.read()
     clean_t = clean(text)
     #print(clean_t)
