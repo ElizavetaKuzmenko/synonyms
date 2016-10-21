@@ -122,7 +122,7 @@ def load_it():
             line = line.strip()
             it_files.add(line)
 
-    for f in list(it_files)[:5]:
+    for f in list(it_files):
         print(f)
         if len(f) < 10:
             continue
@@ -145,7 +145,7 @@ def load_de():
             line = line.strip()
             de_files.add(line)
 
-    for f in list(de_files)[:5]:
+    for f in list(de_files):
         print(f)
         if len(f) < 10:
             continue
