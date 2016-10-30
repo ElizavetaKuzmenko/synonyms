@@ -12,12 +12,12 @@ import treetaggerwrapper
 import re
 
 # CHANGE LANGUAGE
-tagger = treetaggerwrapper.TreeTagger(TAGLANG='fr')
+tagger = treetaggerwrapper.TreeTagger(TAGLANG='pl')
 
 def french():
-    tokenizer = nltk.data.load('tokenizers/punkt/PY3/french.pickle')
-    with open('wiki_fr.txt', 'r', encoding='utf-8') as f:
-        with open('french_wiki.txt', 'w', encoding='utf-8') as fr:
+    tokenizer = nltk.data.load('tokenizers/punkt/PY3/polish.pickle')
+    with open('wiki_pl.txt', 'r', encoding='utf-8') as f:
+        with open('polish_wiki_tagged.txt', 'w', encoding='utf-8') as fr:
             for line in f:
                 #print(line)
                 sentences = tokenizer.tokenize(line.strip().replace('&mdash;', ''))
